@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  DynamoDBEndpoint:
+    Type: String
+    Description: Optionally override the DynamoDB endpoint URL
+  StrideCredentials:
+    Type: String
+    Description: the api key and secret for the Stride API
+  MediaCredentials:
+    Type: String
+    Description: the api key and secret for the Media API
+  UserCredentials:
+    Type: String
+    Description: the api key and secret for the User API
+  BaseUrl:
+    Type: String
+    Description: the URL at which the HttpLambdaFunction will appear
+  DarkSkyKey:
+    Type: String
+    Description: API key for Dark Sky API
+  GoogleGeocodingKey:
+    Type: String
+    Description: Google Maps Geocoding API Key
+  AppClassName:
+    Type: String
+    Description: The fully qualified name of the app descriptor for this App
+
+Resources:
+  BotTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: bot-invocation-topic
+
+  ApiGateway:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: production
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          title:
+            Ref: AWS::StackName
+        paths:
+          /{path}:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpLambdaFunction.Arn}/invocations
+              responses: {}
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpLambdaFunction.Arn}/invocations
+              responses: {}
+
+  HttpLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: org.kablambda.aws.handler.HttpLambdaHandler
+      CodeUri: ./target/lambda-stride-bot-1.0.jar
+      Runtime: java8
+      Timeout: 60
+      MemorySize: 1024
+      Policies:
+       - AWSLambdaExecute
+       - AmazonDynamoDBFullAccess
+       - AmazonSNSFullAccess
+      Events:
+        Request:
+          Type: Api
+          Properties:
+            Path: /{path+}
+            Method: any
+      Environment:
+        Variables:
+          STRIDE_CREDENTIALS: !Ref StrideCredentials
+          DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
+          BASE_URL: !Ref BaseUrl
+          BOT_TOPIC_ARN: !Ref BotTopic
+          APP_CLASS_NAME: !Ref AppClassName
+
+  SnsLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: org.kablambda.aws.handler.SNSLambdaHandler
+      CodeUri: ./target/lambda-stride-bot-1.0.jar
+      Runtime: java8
+      Timeout: 60
+      MemorySize: 1024
+      Policies:
+       - AWSLambdaExecute
+       - AmazonDynamoDBFullAccess
+       - AmazonSNSFullAccess
+      Events:
+        Request:
+          Type: SNS
+          Properties:
+            Topic: !Ref BotTopic
+      Environment:
+        Variables:
+          STRIDE_CREDENTIALS: !Ref StrideCredentials
+          DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
+          BASE_URL: !Ref BaseUrl
+          DARK_SKY_KEY: !Ref DarkSkyKey
+          GOOGLE_GEOCODING_KEY: !Ref GoogleGeocodingKey
+          APP_CLASS_NAME: !Ref AppClassName
+
+  tdaviestest:
+       Type: AWS::Serverless::SimpleTable
+       Properties:
+         PrimaryKey:
+           Name: cloudId
+           Type: String
+         ProvisionedThroughput:
+           ReadCapacityUnits: 5
+           WriteCapacityUnits: 5
