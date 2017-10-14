@@ -29,7 +29,7 @@ sam package \
     --output-template-file packaged.yaml &&
 aws cloudformation deploy \
     --template-file packaged.yaml \
-    --stack-name  \
+    --stack-name ${STACK_NAME:?} \
     --parameter-overrides \
         StrideCredentials=${STRIDE_CREDENTIALS:?} \
         MediaCredentials=${MEDIA_CREDENTIALS:?} \
