@@ -34,7 +34,8 @@ API keys.
 
 ### Deploy to AWS ###
 * Run `./deploy.sh`.
-* TODO: Find the URL your lambda deployed to
+* Find the URL your lambda deployed to by opening the correct stack in the CloudFormation console
+and opening the 'outputs' tab in the bottom frame.
 * Set the `BASE_URL` in `env.sh` to your lambda's Application Gateway URL.
 * Deploy again.
 * TODO: magically fix the things in AWS which didn't work
