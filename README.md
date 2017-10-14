@@ -18,7 +18,7 @@ with `npm install -g aws-sam-local`.
 ### Create a Stride Application ###
 * Sign in to [Create an app](https://developer.atlassian.com/apps/create).
 * Create an app.
-* Enable the Stride API (and optionally the User and Media APIs) -- you will put the ids and secrets
+* Enable the Stride API (and optionally the User and Media APIs, although there is no support for them in this repository yet) -- you will put the ids and secrets
  in the `env.sh` file you create next.
 
 ### Create an env.sh file ###
