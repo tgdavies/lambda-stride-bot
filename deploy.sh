@@ -11,24 +11,25 @@ function verifySet {
     done
 }
 
+required_params="STRIDE_CREDENTIALS MEDIA_CREDENTIALS USER_CREDENTIALS \
+  BASE_URL DARK_SKY_KEY GOOGLE_GEOCODING_KEY APP_CLASS_NAME S3_BUCKET STACK_NAME"
+
 if [ ! -f env.sh ]
 then
-  echo "You need to create an env.sh file setting values for STRIDE_CREDENTIALS, MEDIA_CREDENTIALS, USER_CREDENTIALS, \
-  BASE_URL, DARK_SKY_KEY, GOOGLE_GEOCODING_KEY and APP_CLASS_NAME\nDON'T add env.sh to version control."
+  echo "You need to create an env.sh file setting values for $required_params\n\nDON'T add env.sh to version control."
   exit 1
 else
   . ./env.sh
 fi
-verifySet STRIDE_CREDENTIALS MEDIA_CREDENTIALS USER_CREDENTIALS \
-  BASE_URL DARK_SKY_KEY GOOGLE_GEOCODING_KEY APP_CLASS_NAME
+verifySet $required_params
 mvn package && \
 sam package \
     --template-file template.yaml \
-    --s3-bucket lambda-test.kablambda.org  \
+    --s3-bucket ${S3_BUCKET:?}  \
     --output-template-file packaged.yaml &&
 aws cloudformation deploy \
     --template-file packaged.yaml \
-    --stack-name tdavies-test-stack \
+    --stack-name  \
     --parameter-overrides \
         StrideCredentials=${STRIDE_CREDENTIALS:?} \
         MediaCredentials=${MEDIA_CREDENTIALS:?} \

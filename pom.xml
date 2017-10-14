@@ -2,15 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kablambda.aws</groupId>
+
+    <!-- If you change the artifactId you will need to change the CodeUri values in template.yaml -->
     <artifactId>lambda-stride-bot</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
     <name>A weather forecast bot for Atlassian Stride, hosted on AWS Lambda</name>
-    <!--<parent>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-parent</artifactId>-->
-        <!--<version>1.4.3.RELEASE</version>-->
-    <!--</parent>-->
+
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -100,43 +98,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-shade-plugin</artifactId>-->
-                <!--<version>3.1.0</version>-->
-                <!--<configuration>-->
-                    <!--<createDependencyReducedPom>false</createDependencyReducedPom>-->
-                <!--</configuration>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>package</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>shade</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
         </plugins>
     </build>
-
-    <!--<build>-->
-    <!--<plugins>-->
-    <!--<plugin>-->
-    <!--<groupId>org.apache.maven.plugins</groupId>-->
-    <!--<artifactId>maven-shade-plugin</artifactId>-->
-    <!--<version>3.1.0</version>-->
-    <!--<configuration>-->
-    <!--<createDependencyReducedPom>false</createDependencyReducedPom>-->
-    <!--</configuration>-->
-    <!--<executions>-->
-    <!--<execution>-->
-    <!--<phase>package</phase>-->
-    <!--<goals>-->
-    <!--<goal>shade</goal>-->
-    <!--</goals>-->
-    <!--</execution>-->
-    <!--</executions>-->
-    <!--</plugin>-->
-    <!--</plugins>-->
-    <!--</build>-->
 </project>

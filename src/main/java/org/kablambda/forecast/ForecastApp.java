@@ -15,7 +15,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.kablambda.apis.document.ApplicationCard;
-import org.kablambda.apis.media.AuthenticationClaims;
 import org.kablambda.apis.stride.SortOrder;
 import org.kablambda.apis.stride.StrideApi;
 import org.kablambda.apis.stride.messages.ChatMessageSent;
