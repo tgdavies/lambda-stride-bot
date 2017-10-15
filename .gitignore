@@ -1,3 +1,4 @@
 env.sh
 lambda-stride-bot.iml
 target/
+packaged.yaml
