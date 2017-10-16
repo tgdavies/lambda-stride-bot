@@ -60,6 +60,9 @@ public class StrideApiImpl implements StrideApi {
     private String getAccessToken() {
         try {
             String tokenAndExpiry = accessTokenFuture.get();
+            if (tokenAndExpiry == null) {
+                return null;
+            }
             String[] parts = tokenAndExpiry.split(":");
             if (parts.length != 2) {
                 return null;
