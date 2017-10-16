@@ -90,6 +90,7 @@ Resources:
           BASE_URL: !Ref BaseUrl
           BOT_TOPIC_ARN: !Ref BotTopic
           APP_CLASS_NAME: !Ref AppClassName
+          TABLE_NAME: !Ref StrideBotTable
 
   SnsLambdaFunction:
     Type: AWS::Serverless::Function
@@ -112,12 +113,13 @@ Resources:
         Variables:
           STRIDE_CREDENTIALS: !Ref StrideCredentials
           DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
-          BASE_URL: !Ref BaseUrl
+          BASE_URL: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production
           DARK_SKY_KEY: !Ref DarkSkyKey
           GOOGLE_GEOCODING_KEY: !Ref GoogleGeocodingKey
           APP_CLASS_NAME: !Ref AppClassName
+          TABLE_NAME: !Ref StrideBotTable
 
-  tdaviestest:
+  StrideBotTable:
        Type: AWS::Serverless::SimpleTable
        Properties:
          PrimaryKey:
@@ -126,3 +128,9 @@ Resources:
          ProvisionedThroughput:
            ReadCapacityUnits: 5
            WriteCapacityUnits: 5
+Outputs:
+  BotBaseUrl:
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production
+    Description: Base URL of Bot
+  BotTableName:
+    Value: !Ref StrideBotTable

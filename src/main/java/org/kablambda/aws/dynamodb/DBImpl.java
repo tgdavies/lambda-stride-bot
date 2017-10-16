@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 public class DBImpl implements DB {
     private final AmazonDynamoDB client;
     private final DynamoDB dynamoDB;
-    private static final String TABLE_NAME = "tdaviestest";
+    private static final String TABLE_NAME = System.getenv("TABLE_NAME");
 
     public DBImpl() {
         String endPoint = System.getenv("DYNAMODB_ENDPOINT");
