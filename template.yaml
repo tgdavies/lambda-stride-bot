@@ -9,21 +9,26 @@ Parameters:
   StrideCredentials:
     Type: String
     Description: the api key and secret for the Stride API
+    NoEcho: true
   MediaCredentials:
     Type: String
     Description: the api key and secret for the Media API
+    NoEcho: true
   UserCredentials:
     Type: String
     Description: the api key and secret for the User API
+    NoEcho: true
   BaseUrl:
     Type: String
     Description: the URL at which the HttpLambdaFunction will appear
   DarkSkyKey:
     Type: String
     Description: API key for Dark Sky API
+    NoEcho: true
   GoogleGeocodingKey:
     Type: String
     Description: Google Maps Geocoding API Key
+    NoEcho: true
   AppClassName:
     Type: String
     Description: The fully qualified name of the app descriptor for this App
