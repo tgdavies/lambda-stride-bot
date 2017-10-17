@@ -110,11 +110,22 @@ Resources:
         Variables:
           STRIDE_CREDENTIALS: !Ref StrideCredentials
           DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
+          # I don't think BASE_URL is used
           BASE_URL: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production
           DARK_SKY_KEY: !Ref DarkSkyKey
           GOOGLE_GEOCODING_KEY: !Ref GoogleGeocodingKey
           APP_CLASS_NAME: !Ref AppClassName
           TABLE_NAME: !Ref StrideBotTable
+
+  ConfigLambdaPermission:
+    Type: "AWS::Lambda::Permission"
+    DependsOn:
+    - ApiGateway
+    - HttpLambdaFunction
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref HttpLambdaFunction
+      Principal: apigateway.amazonaws.com
 
   StrideBotTable:
        Type: AWS::Serverless::SimpleTable
