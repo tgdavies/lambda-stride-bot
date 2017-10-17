@@ -12,7 +12,7 @@ function verifySet {
 }
 
 required_params="STRIDE_CREDENTIALS MEDIA_CREDENTIALS USER_CREDENTIALS \
-  BASE_URL DARK_SKY_KEY GOOGLE_GEOCODING_KEY APP_CLASS_NAME S3_BUCKET STACK_NAME"
+  DARK_SKY_KEY GOOGLE_GEOCODING_KEY APP_CLASS_NAME S3_BUCKET STACK_NAME"
 
 if [ ! -f env.sh ]
 then
@@ -35,7 +35,6 @@ aws cloudformation deploy \
         MediaCredentials=${MEDIA_CREDENTIALS:?} \
         UserCredentials=${USER_CREDENTIALS:?} \
         DynamoDBEndpoint= \
-        BaseUrl=${BASE_URL:?} \
         DarkSkyKey=${DARK_SKY_KEY:?} \
         GoogleGeocodingKey=${GOOGLE_GEOCODING_KEY:?} \
         AppClassName=${APP_CLASS_NAME:?} \

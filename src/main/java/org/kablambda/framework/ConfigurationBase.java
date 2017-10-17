@@ -10,6 +10,7 @@ import com.google.gson.stream.JsonWriter;
 
 import org.kablambda.apis.API;
 import org.kablambda.apis.stride.Credentials;
+import org.kablambda.aws.handler.HttpLambdaRequest;
 import org.kablambda.framework.modules.Module;
 import org.kablambda.json.Json;
 
@@ -44,12 +45,13 @@ public class ConfigurationBase implements Configuration {
     }
 
     @Override
-    public String toJsonString() {
+    public String toJsonString(HttpLambdaRequest httpLambdaRequest) {
         StringWriter sw = new StringWriter();
         JsonWriter writer = new JsonWriter(sw);
         Json json = new Json(writer);
+        String host = httpLambdaRequest.getHeaders().get("Host");
         Map<String, List<Module>> modules = app.getModules().stream().collect(Collectors.groupingBy(m -> m.getKey()));
-        json.object(json1 -> json1.field("name", app.getName()).field("baseUrl", System.getenv("BASE_URL"))
+        json.object(json1 -> json1.field("name", app.getName()).field("baseUrl", "https://" + host + "/" + System.getenv("STAGE_NAME"))
                                   .object(
                                           "lifecycle",
                                           j -> j.field("installed", "/installed")

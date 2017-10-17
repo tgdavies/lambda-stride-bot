@@ -18,9 +18,6 @@ Parameters:
     Type: String
     Description: the api key and secret for the User API
     NoEcho: true
-  BaseUrl:
-    Type: String
-    Description: the URL at which the HttpLambdaFunction will appear
   DarkSkyKey:
     Type: String
     Description: API key for Dark Sky API
@@ -87,10 +84,10 @@ Resources:
         Variables:
           STRIDE_CREDENTIALS: !Ref StrideCredentials
           DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
-          BASE_URL: !Ref BaseUrl
           BOT_TOPIC_ARN: !Ref BotTopic
           APP_CLASS_NAME: !Ref AppClassName
           TABLE_NAME: !Ref StrideBotTable
+          STAGE_NAME: production
 
   SnsLambdaFunction:
     Type: AWS::Serverless::Function
@@ -129,8 +126,8 @@ Resources:
            ReadCapacityUnits: 5
            WriteCapacityUnits: 5
 Outputs:
-  BotBaseUrl:
-    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production
-    Description: Base URL of Bot
+  BotApplicationDescriptorUrl:
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production/app-descriptor.json
+    Description: Descriptor URL of Bot for installation
   BotTableName:
     Value: !Ref StrideBotTable

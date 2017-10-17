@@ -11,7 +11,7 @@ public class AppDescriptorHttpHandler extends PathHttpHandler {
     public AppDescriptorHttpHandler() {
         super(
                 s -> s.equals("/app-descriptor.json"),
-                o -> new Response(200, Services.getConfig().toJsonString(), Collections.emptyMap())
+                o -> new Response(200, Services.getConfig().toJsonString(o), Collections.emptyMap())
         );
     }
 }

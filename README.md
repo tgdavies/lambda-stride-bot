@@ -34,14 +34,12 @@ API keys.
 
 ### Deploy to AWS ###
 * Run `./deploy.sh`.
-* Find the URL your lambda deployed to by opening the correct stack in the CloudFormation console
+* Find the app descriptor URL for your lambda by opening the correct stack in the CloudFormation console
 and opening the 'outputs' tab in the bottom frame.
-* Set the `BASE_URL` in `env.sh` to your lambda's Application Gateway URL.
-* Deploy again.
 * TODO: magically fix the things in AWS which didn't work
 
 ### Register your descriptor with Stride ###
-* Go to the 'Install' tab of your app and put the value of `$BASE_URL/app-descriptor.json` into the 
+* Go to the 'Install' tab of your app and put the value of the app descriptor URL into the 
 'Descriptor URL' field.
 * Click 'Refresh'.
 * Now you can use the 'Installation URL' to install your bot into Stride, using the 'Apps' icon in 
