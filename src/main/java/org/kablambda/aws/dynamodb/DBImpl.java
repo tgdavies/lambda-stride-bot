@@ -46,34 +46,6 @@ public class DBImpl implements DB {
     }
 
     @Override
-    public void createTable() {
-        try {
-            try {
-                dynamoDB.getTable(TABLE_NAME).describe();
-                return;
-            } catch (ResourceNotFoundException e) {
-                // table doesn't exist
-            } catch (Exception e) {
-                throw new RuntimeException("Error checking whether table exists", e);
-            }
-            System.err.println("Attempting to create table; please wait...");
-            Table table = dynamoDB.createTable(TABLE_NAME,
-                    Lists.newArrayList(
-                            new KeySchemaElement("cloudId", KeyType.HASH)
-                    ),
-                    Lists.newArrayList(
-                            new AttributeDefinition("cloudId", ScalarAttributeType.S)
-                    ),
-                    new ProvisionedThroughput(10L, 10L)
-            );
-            table.waitForActive();
-            System.err.println("Success.  Table status: " + table.getDescription().getTableStatus());
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating table", e);
-        }
-    }
-
-    @Override
     public void write(String cloudId, String name, String value) {
         PutItemOutcome o = dynamoDB.getTable(TABLE_NAME).putItem(
                 new Item().withPrimaryKey("cloudId", cloudId + "/" + name)

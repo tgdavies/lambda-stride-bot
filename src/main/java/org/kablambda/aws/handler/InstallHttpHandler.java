@@ -14,7 +14,6 @@ public class InstallHttpHandler extends PathHttpHandler {
         super(s -> s.equals("/installed"), r -> {
             JwtTools.checkJwt(configuration.getCredentials(API.STRIDE), r);
             Installed installed = Services.getGson().fromJson(r.getBody(), Installed.class);
-            Services.getDB().createTable();
             Services.getDB().write(installed.getCloudId(), "installed", r.getBody());
             return new Response(200);
         });
