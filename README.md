@@ -26,7 +26,6 @@ with `npm install -g aws-sam-local`.
 * The api ids and secrets come from the app creation process above.
 * If you want to run the sample 'Forecast' bot you will need to get Google geocoding and Dark Sky 
 API keys.
-* The base URL can only be set once you have done a deployment.
 
 ### Create your own bot implementation ###
 * Create a class which implements `org.kablambda.framework.App` see `org.kablambda.forecast.ForecastApp` for an example.
@@ -34,9 +33,7 @@ API keys.
 
 ### Deploy to AWS ###
 * Run `./deploy.sh`.
-* Find the app descriptor URL for your lambda by opening the correct stack in the CloudFormation console
-and opening the 'outputs' tab in the bottom frame.
-* TODO: magically fix the things in AWS which didn't work
+* The Application Descriptor URL will be printed in the console.
 
 ### Register your descriptor with Stride ###
 * Go to the 'Install' tab of your app and put the value of the app descriptor URL into the 

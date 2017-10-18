@@ -39,3 +39,5 @@ aws cloudformation deploy \
         GoogleGeocodingKey=${GOOGLE_GEOCODING_KEY:?} \
         AppClassName=${APP_CLASS_NAME:?} \
     --capabilities CAPABILITY_IAM
+echo "\nApplication Descriptor URL: \c"
+aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query 'Stacks[0].Outputs[?OutputKey==`BotApplicationDescriptorUrl`].OutputValue' --output text
