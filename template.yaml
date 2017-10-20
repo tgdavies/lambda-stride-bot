@@ -46,7 +46,17 @@ Resources:
           title:
             Ref: AWS::StackName
         paths:
-          /{path}:
+          /static/{item}:
+            get:
+              parameters: [{ name: item, in: path, required: true, type: string}]
+              x-amazon-apigateway-integration:
+                httpMethod: GET
+                type: http
+                uri:
+                  !Join [ "", [!Ref StaticContentBucket, '/', '{object}']]
+                responses: { '4\d{2}': { statusCode: '400' }, default: { statusCode: '200', responseParameters: { method.response.header.content-type: integration.response.header.content-type, method.response.header.Content-Type: integration.response.header.Content-Type } }, '5\d{2}': { statusCode: '500' } }
+                requestParameters: { integration.request.path.object: method.request.path.item }
+          /api/{path}:
             get:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -136,6 +146,11 @@ Resources:
          ProvisionedThroughput:
            ReadCapacityUnits: 5
            WriteCapacityUnits: 5
+  StaticContentBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+
 Outputs:
   BotApplicationDescriptorUrl:
     Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production/app-descriptor.json

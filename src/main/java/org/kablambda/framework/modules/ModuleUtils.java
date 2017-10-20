@@ -12,6 +12,8 @@ import org.kablambda.aws.handler.Response;
 import org.kablambda.aws.handler.SNSRecord;
 import org.kablambda.framework.Services;
 
+import java.util.function.Function;
+
 public class ModuleUtils {
     /**
      * Verify that the request's JWT is OK and then forward it's body to our SNS listener, with a subject which will allow
@@ -25,6 +27,12 @@ public class ModuleUtils {
         JwtTools.checkJwt(Services.getConfig().getCredentials(API.STRIDE), lambdaRequest);
         PublishResult result = Services.getSNS().publish(System.getenv("BOT_TOPIC_ARN"), lambdaRequest.getBody(), subject);
         return new Response(200);
+    }
+
+    public static Response checkAndReturnJSON(HttpLambdaRequest lambdaRequest, Function<HttpLambdaRequest,Object> handler) {
+        JwtTools.checkJwt(Services.getConfig().getCredentials(API.STRIDE), lambdaRequest);
+        Object o = handler.apply(lambdaRequest);
+        return new Response(200, Services.getGson().toJson(o));
     }
 
     /**

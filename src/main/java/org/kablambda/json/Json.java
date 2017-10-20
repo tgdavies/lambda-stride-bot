@@ -3,6 +3,7 @@ package org.kablambda.json;
 import java.io.IOException;
 
 import com.google.gson.stream.JsonWriter;
+import org.kablambda.framework.Services;
 
 public class Json {
     private final JsonWriter writer;
@@ -58,6 +59,15 @@ public class Json {
             return this;
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Json object(Object o) {
+        try {
+            writer.jsonValue(Services.getGson().toJson(o));
+            return this;
+        } catch (IOException e) {
+            throw new RuntimeException("Error converting " + o.toString() + " to JSON.", e);
         }
     }
 
