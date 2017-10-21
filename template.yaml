@@ -45,17 +45,51 @@ Resources:
         info:
           title:
             Ref: AWS::StackName
+        x-amazon-apigateway-binary-media-types:
+          - '*/*'
         paths:
           /static/{item}:
             get:
-              parameters: [{ name: item, in: path, required: true, type: string}]
+              produces:
+                - application/json
+              parameters:
+                - name: item
+                  in: path
+                  required: true
+                  type: string
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    content-type:
+                      type: string
+                    Content-Type:
+                      type: string
+                '400':
+                  description: 400 response
+                '500':
+                  description: 500 response
               x-amazon-apigateway-integration:
+                credentials: arn:aws:iam::168934263056:role/s3proxy
                 httpMethod: GET
-                type: http
+                passthroughBehavior: when_no_match
+                type: aws
                 uri:
-                  !Join [ "", [!Ref StaticContentBucket, '/', '{object}']]
-                responses: { '4\d{2}': { statusCode: '400' }, default: { statusCode: '200', responseParameters: { method.response.header.content-type: integration.response.header.content-type, method.response.header.Content-Type: integration.response.header.Content-Type } }, '5\d{2}': { statusCode: '500' } }
-                requestParameters: { integration.request.path.object: method.request.path.item }
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:s3:path/${StaticContentBucket}/{object}
+                responses:
+                  '4\d{2}':
+                    statusCode: '400'
+                  default:
+                    statusCode: '200'
+                    responseParameters:
+                      method.response.header.content-type: integration.response.header.content-type
+                      method.response.header.Content-Type: integration.response.header.Content-Type
+                  '5\d{2}':
+                    statusCode: '500'
+                requestParameters:
+                  integration.request.path.object: method.request.path.item
           /api/{path}:
             get:
               x-amazon-apigateway-integration:
@@ -153,7 +187,9 @@ Resources:
 
 Outputs:
   BotApplicationDescriptorUrl:
-    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production/app-descriptor.json
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production/api/app-descriptor.json
     Description: Descriptor URL of Bot for installation
   BotTableName:
     Value: !Ref StrideBotTable
+  StaticContentBucketRef:
+    Value: !Ref StaticContentBucket

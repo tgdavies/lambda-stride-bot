@@ -56,7 +56,7 @@ public class BotMessage implements Module {
         json.object(j2 -> j2
                 .field("key", "bot-message-" + key)
                 .field("pattern", pattern)
-                .field("url", getMessagePath())
+                .field("url", "/api" + getMessagePath())
         );
     }
 

@@ -44,4 +44,16 @@ public class HttpLambdaRequest {
     public String getPath() {
         return path;
     }
+
+    @Override
+    public String toString() {
+        return "HttpLambdaRequest{" +
+               "httpMethod='" + httpMethod + '\'' +
+               ", body='" + body + '\'' +
+               ", resource='" + resource + '\'' +
+               ", queryStringParameters=" + queryStringParameters +
+               ", headers=" + headers +
+               ", path='" + path + '\'' +
+               '}';
+    }
 }

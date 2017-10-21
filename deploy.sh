@@ -40,4 +40,6 @@ aws cloudformation deploy \
         AppClassName=${APP_CLASS_NAME:?} \
     --capabilities CAPABILITY_IAM
 echo "\nApplication Descriptor URL: \c"
+
 aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query 'Stacks[0].Outputs[?OutputKey==`BotApplicationDescriptorUrl`].OutputValue' --output text
+aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query 'Stacks[0].Outputs[?OutputKey==`StaticContentBucketRef`].OutputValue' --output text

@@ -79,7 +79,7 @@ public class Glance implements Module {
             this.name = name;
             this.icon = icon;
             this.target = target;
-            this.queryUrl = queryUrl;
+            this.queryUrl = "/api" + queryUrl;
             this.weight = weight;
         }
 

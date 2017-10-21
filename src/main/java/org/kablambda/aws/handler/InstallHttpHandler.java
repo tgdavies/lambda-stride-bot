@@ -11,7 +11,7 @@ import org.kablambda.apis.stride.messages.Installed;
  */
 public class InstallHttpHandler extends PathHttpHandler {
     public InstallHttpHandler(Configuration configuration) {
-        super(s -> s.equals("/installed"), r -> {
+        super(s -> s.equals("/api/installed"), r -> {
             JwtTools.checkJwt(configuration.getCredentials(API.STRIDE), r);
             Installed installed = Services.getGson().fromJson(r.getBody(), Installed.class);
             Services.getDB().write(installed.getCloudId(), "installed", r.getBody());

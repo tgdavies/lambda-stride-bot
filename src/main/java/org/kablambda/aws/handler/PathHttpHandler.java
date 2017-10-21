@@ -11,7 +11,8 @@ public class PathHttpHandler implements HttpHandler {
     private final Function<HttpLambdaRequest, Response> handle;
 
     public static PathHttpHandler pathEqual(String path, Function<HttpLambdaRequest,Response> handle) {
-        return new PathHttpHandler(p -> path.equals(p), handle);
+        final String actualPath = "/api" + path;
+        return new PathHttpHandler(p -> actualPath.equals(p), handle);
     }
 
     protected PathHttpHandler(Function<String,Boolean> match, Function<HttpLambdaRequest,Response> handle) {

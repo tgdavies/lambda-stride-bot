@@ -54,8 +54,8 @@ public class ConfigurationBase implements Configuration {
         json.object(json1 -> json1.field("name", app.getName()).field("baseUrl", "https://" + host + "/" + System.getenv("STAGE_NAME"))
                                   .object(
                                           "lifecycle",
-                                          j -> j.field("installed", "/installed")
-                                                .field("uninstalled", "/uninstalled")
+                                          j -> j.field("installed", "/api/installed")
+                                                .field("uninstalled", "/api/uninstalled")
                                   )
                                   .object(
                                           "modules",

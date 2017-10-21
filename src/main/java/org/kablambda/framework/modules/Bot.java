@@ -76,8 +76,8 @@ public class Bot implements Module {
     public void renderDescriptor(Json json) {
         json.object(j2 -> j2
                 .field("key", "bot-" + name)
-                .object("mention", j3 -> j3.field("url", getMentionPath()))
-                .object("directMessage", j3 -> j3.field("url", getDirectMessagePath()))
+                .object("mention", j3 -> j3.field("url", "/api" + getMentionPath()))
+                .object("directMessage", j3 -> j3.field("url", "/api" + getDirectMessagePath()))
         );
     }
 
