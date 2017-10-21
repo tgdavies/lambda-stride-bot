@@ -46,7 +46,7 @@ Resources:
           title:
             Ref: AWS::StackName
         x-amazon-apigateway-binary-media-types:
-          - '*/*'
+          - 'image/*'
         paths:
           /static/{item}:
             get:
