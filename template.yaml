@@ -72,7 +72,7 @@ Resources:
                 '500':
                   description: 500 response
               x-amazon-apigateway-integration:
-                credentials: arn:aws:iam::168934263056:role/s3proxy
+                credentials: !GetAtt S3ProxyRole.Arn
                 httpMethod: GET
                 passthroughBehavior: when_no_match
                 type: aws
@@ -185,6 +185,17 @@ Resources:
       Properties:
         AccessControl: PublicRead
 
+  S3ProxyRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          -
+            Effect: Allow
+            Action: "sts:AssumeRole"
+            Principal:
+              Service:
+                - "apigateway.amazonaws.com"
 Outputs:
   BotApplicationDescriptorUrl:
     Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production/api/app-descriptor.json
