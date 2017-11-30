@@ -42,4 +42,6 @@ aws cloudformation deploy \
 echo "\nApplication Descriptor URL: \c"
 
 aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query 'Stacks[0].Outputs[?OutputKey==`BotApplicationDescriptorUrl`].OutputValue' --output text
-aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query 'Stacks[0].Outputs[?OutputKey==`StaticContentBucketRef`].OutputValue' --output text
+BUCKET=$(aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query 'Stacks[0].Outputs[?OutputKey==`StaticContentBucketRef`].OutputValue' --output text)
+
+aws s3 sync static s3://$BUCKET --acl public-read
