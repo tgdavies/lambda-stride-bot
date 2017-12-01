@@ -7,11 +7,20 @@ import org.kablambda.aws.handler.HttpLambdaRequest;
 import org.kablambda.apis.stride.Credentials;
 import org.kablambda.framework.Services;
 
+import java.util.Map;
+
 public class JwtTools {
     public static void checkJwt(Credentials credentials, HttpLambdaRequest r) {
-        String token = r.getHeaders().get("Authorization");
+        String token = r.getQueryStringParameters().get("jwt");
         if (token == null) {
-            throw new RuntimeException("No \"Authorization\" header present on request to " + r.getPath());
+            Map<String, String> headers = r.getHeaders();
+            if (headers == null) {
+                throw new RuntimeException("No headers present on request to " + r.getPath());
+            }
+            token = headers.get("Authorization");
+            if (token == null) {
+                throw new RuntimeException("No \"Authorization\" header present on request to " + r.getPath());
+            }
         }
         if (!Jwts.parser().setSigningKey(credentials.getClientSecret()).isSigned(token)) {
             throw new RuntimeException("Invalid JWT token on request to " + r.getPath());

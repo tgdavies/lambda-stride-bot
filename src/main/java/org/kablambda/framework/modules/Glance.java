@@ -16,11 +16,15 @@ public class Glance implements Module {
     private final String key;
     private final String name;
     private final GlanceQueryAction action;
-    private final GlanceTarget target;
+    private final String target;
     private final Optional<Integer> weight;
     private final List<Condition> conditions;
 
-    private Glance(final String key, final String name, final GlanceQueryAction action, final GlanceTarget target, Optional<Integer> weight, List<Condition> conditions) {
+    public static Glance create(final String key, final String name, final GlanceQueryAction action, final String target, Optional<Integer> weight, List<Condition> conditions) {
+        return new Glance(key, name, action, target, weight, conditions);
+    }
+
+    private Glance(final String key, final String name, final GlanceQueryAction action, final String target, Optional<Integer> weight, List<Condition> conditions) {
         this.key = key;
         this.name = name;
         this.action = action;
@@ -39,7 +43,7 @@ public class Glance implements Module {
     }
 
     private String getQueryPath() {
-        return "/glance-" + key + "/state";
+        return "/glance-" + key + "-state";
     }
 
     @Override
@@ -54,7 +58,7 @@ public class Glance implements Module {
                         key,
                         new GlanceDescriptor.Name(null, name),
                         new GlanceDescriptor.Icon(key + "-icon", "png"),
-                        "app-sidebar",
+                        target,
                         getQueryPath(),
                         weight.orElse(null)
                 )
@@ -93,21 +97,13 @@ public class Glance implements Module {
             }
         }
         private static class Icon {
-            private String name;
-            private String suffix;
+            private String url;
+            @SerializedName("url@2x")
+            private String url2x;
 
             public Icon(String name, String suffix) {
-                this.name = name;
-                this.suffix = suffix;
-            }
-
-            public String getUrl() {
-                return name + "." + suffix;
-            }
-
-            @SerializedName("url@2x")
-            public String get2xUrl() {
-                return name + "2x." + suffix;
+                this.url = "/static/" + name + "." + suffix;
+                this.url2x = "/static/" + name + "2x." + suffix;
             }
         }
     }

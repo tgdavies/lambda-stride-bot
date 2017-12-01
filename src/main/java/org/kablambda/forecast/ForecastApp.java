@@ -18,6 +18,7 @@ import org.kablambda.apis.document.ApplicationCard;
 import org.kablambda.apis.stride.SortOrder;
 import org.kablambda.apis.stride.StrideApi;
 import org.kablambda.apis.stride.messages.ChatMessageSent;
+import org.kablambda.aws.handler.HttpLambdaRequest;
 import org.kablambda.framework.Services;
 import org.kablambda.framework.App;
 import org.kablambda.apis.document.Doc;
@@ -26,8 +27,12 @@ import org.kablambda.apis.document.Text;
 import org.kablambda.apis.stride.messages.Message;
 import org.kablambda.framework.modules.Bot;
 import org.kablambda.framework.modules.BotMessage;
+import org.kablambda.framework.modules.Glance;
+import org.kablambda.framework.modules.GlanceState;
 import org.kablambda.framework.modules.MessageAction;
 import org.kablambda.framework.modules.Module;
+import org.kablambda.framework.modules.Sidebar;
+import org.kablambda.framework.modules.SidebarRendererAction;
 
 public class ForecastApp implements App {
     public List<Module> getModules() {
@@ -100,7 +105,30 @@ public class ForecastApp implements App {
                             ));
                     return null;
                 }),
-                createBotMessage());
+                createBotMessage(),
+                createGlance(),
+                createSidebar());
+    }
+
+    private Glance createGlance() {
+        return Glance.create(
+                "forecast-glance",
+                "glance-name",
+                (api, parameter) -> {
+                    return new GlanceState("Weather Forecast");
+                },
+                "forecast-sidebar",
+                Optional.empty(),
+                Collections.emptyList());
+    }
+
+    private Sidebar createSidebar() {
+        return Sidebar.create("forecast-sidebar", "Weather Forecast", new SidebarRendererAction() {
+            @Override
+            public String doAction(StrideApi api, HttpLambdaRequest parameter) {
+                return "<html><head><script src='https://dev-lib.stride.com/javascript/simple-xdm.js'></script></head><body><div>Hello World</div></body></html>";
+            }
+        });
     }
 
     private BotMessage createBotMessage() {

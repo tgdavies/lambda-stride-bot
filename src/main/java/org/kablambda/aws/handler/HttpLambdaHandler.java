@@ -28,9 +28,10 @@ public class HttpLambdaHandler extends BaseLambdaHandler {
     public void handleRequest(InputStream inputStream, OutputStream outputStream) throws IOException {
 
         Configuration config = Services.getConfig();
-        Response r = null;
+        Response r;
         try {
             HttpLambdaRequest httpLambdaRequest = Services.getGson().fromJson(new InputStreamReader(inputStream), HttpLambdaRequest.class);
+            Services.log("Path: " + httpLambdaRequest.getPath());
 
             ApiFactory apiFactory = new ApiFactoryImpl();
             List<HttpHandler> httpHandlers = Lists.newArrayList(new AppDescriptorHttpHandler(), new InstallHttpHandler(config));
@@ -61,7 +62,12 @@ public class HttpLambdaHandler extends BaseLambdaHandler {
         }
         writer.name("statusCode").value(r.getStatus());
         //TODO headers
-        writer.name("headers").beginObject().name("Content-Type").value("application/json").endObject();
+        writer.name("headers").beginObject()
+                .name("Content-Type").value("application/json")
+                .name("Access-Control-Allow-Origin").value("*")
+                .name("Access-Control-Allow-Methods").value("*")
+                .name("Access-Control-Allow-Headers").value("Content-Type,X-Amz-Date,Authorization,X-Api-Key")
+                .endObject();
         writer.endObject();
         writer.flush();
         writer.close();
