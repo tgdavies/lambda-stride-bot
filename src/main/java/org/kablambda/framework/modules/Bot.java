@@ -6,15 +6,9 @@ import com.amazonaws.services.sns.model.PublishResult;
 import com.google.common.collect.Lists;
 
 import org.kablambda.aws.handler.HttpHandler;
-import org.kablambda.aws.handler.HttpLambdaRequest;
-import org.kablambda.aws.handler.Response;
 import org.kablambda.aws.handler.SNSHandler;
-import org.kablambda.aws.handler.SNSRecord;
-import org.kablambda.apis.API;
 import org.kablambda.apis.stride.ApiFactory;
-import org.kablambda.apis.jwt.JwtTools;
 import org.kablambda.apis.stride.messages.ChatMessageSent;
-import org.kablambda.framework.Services;
 import org.kablambda.json.Json;
 
 import static org.kablambda.aws.handler.PathHttpHandler.pathEqual;

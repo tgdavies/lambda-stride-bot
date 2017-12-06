@@ -61,13 +61,18 @@ public class HttpLambdaHandler extends BaseLambdaHandler {
             writer.value("{}");
         }
         writer.name("statusCode").value(r.getStatus());
-        //TODO headers
         writer.name("headers").beginObject()
-                .name("Content-Type").value("application/json")
                 .name("Access-Control-Allow-Origin").value("*")
                 .name("Access-Control-Allow-Methods").value("*")
-                .name("Access-Control-Allow-Headers").value("Content-Type,X-Amz-Date,Authorization,X-Api-Key")
-                .endObject();
+                .name("Access-Control-Allow-Headers").value("Content-Type,X-Amz-Date,Authorization,X-Api-Key");
+        r.getHeaders().forEach((name, value) -> {
+            try {
+                writer.name(name).value(value);
+            } catch (IOException e) {
+                throw new RuntimeException("Error adding header " + name, e);
+            }
+        });
+        writer.endObject();
         writer.endObject();
         writer.flush();
         writer.close();

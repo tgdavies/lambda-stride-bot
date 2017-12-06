@@ -4,7 +4,6 @@ import org.kablambda.apis.stride.ApiFactory;
 import org.kablambda.aws.handler.HttpHandler;
 import org.kablambda.aws.handler.PathHttpHandler;
 import org.kablambda.aws.handler.SNSHandler;
-import org.kablambda.aws.handler.SNSRecord;
 import org.kablambda.json.Json;
 
 import java.util.Collections;
@@ -29,7 +28,7 @@ public class Sidebar implements Module {
     public List<HttpHandler> getHttpHandlers(ApiFactory apiFactory) {
         return Collections.singletonList(PathHttpHandler.pathEqual(
                 getSidebarIframePath(),
-                r -> ModuleUtils.checkAndReturnJSON(r, lambdaRequest -> renderer.doAction(null, lambdaRequest))
+                r -> ModuleUtils.checkAndReturnHTML(r, lambdaRequest -> renderer.doAction(null, lambdaRequest))
         ));
     }
 

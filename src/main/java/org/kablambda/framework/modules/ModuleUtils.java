@@ -5,13 +5,14 @@ import com.amazonaws.services.sns.model.PublishResult;
 import org.kablambda.apis.API;
 import org.kablambda.apis.jwt.JwtTools;
 import org.kablambda.apis.stride.ApiFactory;
-import org.kablambda.apis.stride.messages.ChatMessageSent;
 import org.kablambda.apis.stride.messages.HasUniqueId;
 import org.kablambda.aws.handler.HttpLambdaRequest;
 import org.kablambda.aws.handler.Response;
 import org.kablambda.aws.handler.SNSRecord;
 import org.kablambda.framework.Services;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.function.Function;
 
 public class ModuleUtils {
@@ -30,9 +31,16 @@ public class ModuleUtils {
     }
 
     public static Response checkAndReturnJSON(HttpLambdaRequest lambdaRequest, Function<HttpLambdaRequest,Object> handler) {
+        return checkAndReturn(lambdaRequest, r -> Services.getGson().toJson(handler.apply(r)), "application/json");
+    }
+
+    public static Response checkAndReturnHTML(HttpLambdaRequest lambdaRequest, Function<HttpLambdaRequest,String> handler) {
+        return checkAndReturn(lambdaRequest, handler, "text/html");
+    }
+
+    private static Response checkAndReturn(HttpLambdaRequest lambdaRequest, Function<HttpLambdaRequest,String> handler, String contentType) {
         JwtTools.checkJwt(Services.getConfig().getCredentials(API.STRIDE), lambdaRequest);
-        Object o = handler.apply(lambdaRequest);
-        return new Response(200, Services.getGson().toJson(o));
+        return new Response(200, handler.apply(lambdaRequest), Collections.singletonMap("Content-Type", contentType));
     }
 
     /**
