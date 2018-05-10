@@ -43,7 +43,7 @@ public class Glance implements Module {
     }
 
     private String getQueryPath() {
-        return "/glance-" + key + "-state";
+        return "glance-" + key + "-state";
     }
 
     @Override
@@ -52,14 +52,14 @@ public class Glance implements Module {
     }
 
     @Override
-    public void renderDescriptor(Json json) {
+    public void renderDescriptor(String tenantUuid, Json json) {
         json.object(
                 new GlanceDescriptor(
                         key,
                         new GlanceDescriptor.Name(null, name),
                         new GlanceDescriptor.Icon(key + "-icon", "png"),
                         target,
-                        getQueryPath(),
+                        "/" + tenantUuid + "/" + getQueryPath(),
                         weight.orElse(null)
                 )
         );

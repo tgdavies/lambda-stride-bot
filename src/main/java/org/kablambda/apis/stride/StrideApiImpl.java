@@ -21,12 +21,14 @@ import java.util.function.Function;
 public class StrideApiImpl implements StrideApi {
     private static final String API_URL = "https://api.atlassian.com/site/";
     private static final String AUTH_URL = "https://auth.atlassian.com/oauth/token";
+    private final String tenantUuid;
     private final String cloudId;
     private Future<String> accessTokenFuture;
 
-    public StrideApiImpl(String cloudId) {
+    public StrideApiImpl(String tenantUuid, String cloudId) {
+        this.tenantUuid = tenantUuid;
         this.cloudId = cloudId;
-        this.accessTokenFuture = Services.future(() -> Services.getDB().read(cloudId, "access_token").orElse(null));
+        this.accessTokenFuture = Services.future(() -> Services.getDB().read(tenantUuid, cloudId, "access_token").orElse(null));
     }
 
     @Override
@@ -125,7 +127,7 @@ public class StrideApiImpl implements StrideApi {
                             new GenericUrl(AUTH_URL),
                             new ByteArrayContent(
                                     "application/json",
-                                    Services.getGson().toJson(TokenRequest.makeTokenRequest(API.STRIDE)).getBytes()
+                                    Services.getGson().toJson(TokenRequest.makeTokenRequest(tenantUuid, API.STRIDE)).getBytes()
                             )
                     );
                     HttpResponse response = r.execute();
@@ -137,7 +139,7 @@ public class StrideApiImpl implements StrideApi {
                     String accessToken = t.getAccess_token();
                     long expiryTime = System.currentTimeMillis() + t.getExpires_in() * 1000;
                     String tokenAndExpiry = accessToken + ":" + expiryTime;
-                    Services.getDB().write(cloudId, "access_token", tokenAndExpiry);
+                    Services.getDB().write(tenantUuid, cloudId, "access_token", tokenAndExpiry);
                     return tokenAndExpiry;
                 } catch (IOException e) {
                     throw new RuntimeException(e);

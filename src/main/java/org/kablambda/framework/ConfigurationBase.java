@@ -11,14 +11,21 @@ import com.google.gson.stream.JsonWriter;
 import org.kablambda.apis.API;
 import org.kablambda.apis.stride.Credentials;
 import org.kablambda.aws.handler.HttpLambdaRequest;
+import org.kablambda.aws.handler.RegisterHandler;
 import org.kablambda.framework.modules.Module;
 import org.kablambda.json.Json;
+
+import static org.kablambda.framework.Services.getTenant;
 
 public class ConfigurationBase implements Configuration {
     private final Map<API, Credentials> credentialsMap = new HashMap<>();
     private final App app;
+    private String tenantUuid;
+    private final RegisterHandler.Register tenant;
 
-    public ConfigurationBase() {
+    public ConfigurationBase(String tenantUuid) {
+        this.tenantUuid = tenantUuid;
+        this.tenant = getTenant(tenantUuid);
         try {
             Class appClass = Class.forName(System.getenv("APP_CLASS_NAME"));
             app = (App) appClass.newInstance();
@@ -26,7 +33,7 @@ public class ConfigurationBase implements Configuration {
             throw new RuntimeException("No class APP_CLASS_NAME='" + System.getenv("APP_CLASS_NAME") + "'", e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Class APP_CLASS_NAME='" + System.getenv("APP_CLASS_NAME") + "' has no accessible default constructor.",
-                                       e);
+                    e);
         } catch (InstantiationException e) {
             throw new RuntimeException("Error creating instance of Class APP_CLASS_NAME='" + System.getenv(
                     "APP_CLASS_NAME") + "'", e);
@@ -35,13 +42,13 @@ public class ConfigurationBase implements Configuration {
 
     @Override
     public String getName() {
-        return app.getName();
+        return app.getName(tenant.getBotName());
     }
 
 
     @Override
     public List<Module> getModules() {
-        return app.getModules();
+        return app.getModules(tenantUuid);
     }
 
     @Override
@@ -50,23 +57,23 @@ public class ConfigurationBase implements Configuration {
         JsonWriter writer = new JsonWriter(sw);
         Json json = new Json(writer);
         String host = httpLambdaRequest.getHeaders().get("Host");
-        Map<String, List<Module>> modules = app.getModules().stream().collect(Collectors.groupingBy(m -> m.getKey()));
-        json.object(json1 -> json1.field("name", app.getName()).field("baseUrl", "https://" + host + "/" + System.getenv("STAGE_NAME"))
-                                  .object(
-                                          "lifecycle",
-                                          j -> j.field("installed", "/api/installed")
-                                                .field("uninstalled", "/api/uninstalled")
-                                  )
-                                  .object(
-                                          "modules",
-                                          json2 -> modules.entrySet()
-                                                          .forEach(e -> json2.array(
-                                                                  e.getKey(),
-                                                                  json3 -> e.getValue()
-                                                                            .forEach(m -> m.renderDescriptor(json3))
-                                                                   )
-                                                          )
-                                  )
+        Map<String, List<Module>> modules = app.getModules(tenantUuid).stream().collect(Collectors.groupingBy(Module::getKey));
+        json.object(json1 -> json1
+                .field("name", app.getName(tenantUuid))
+                .field("baseUrl", "https://" + host + "/" + System.getenv("STAGE_NAME"))
+                .object(
+                        "lifecycle",
+                        j -> j.field("installed", "/api/" + tenantUuid + "/installed")
+                                .field("uninstalled", "/api/" + tenantUuid + "/uninstalled")
+                )
+                .object(
+                        "modules",
+                        json2 -> modules.forEach((key, value) -> json2.array(
+                                key,
+                                json3 -> value
+                                        .forEach(m -> m.renderDescriptor(tenantUuid, json3))
+                        ))
+                )
         );
         return sw.toString();
     }
@@ -75,10 +82,7 @@ public class ConfigurationBase implements Configuration {
     public Credentials getCredentials(API api) {
         Credentials c = credentialsMap.get(api);
         if (c == null) {
-            final String credentials = System.getenv(api.getEnvVariableName());
-            if (credentials == null) {
-                throw new RuntimeException("No value set for " + api.getEnvVariableName());
-            }
+            final String credentials = api.getCredentials(tenant);
             final String[] parts = credentials.split(":");
             if (parts.length != 2) {
                 throw new RuntimeException("Bad format for credentials: " + credentials);

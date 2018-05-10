@@ -19,8 +19,8 @@ public class TokenRequest {
         this.audience = audience;
     }
 
-    public static TokenRequest makeTokenRequest(API api) {
-        Credentials credentials = Services.getConfig().getCredentials(api);
+    public static TokenRequest makeTokenRequest(String tenantUuid, API api) {
+        Credentials credentials = Services.getConfig(tenantUuid).getCredentials(api);
         return new TokenRequest("client_credentials", credentials.getClientId(), credentials.getClientSecret(), "api.atlassian.com");
     }
 }

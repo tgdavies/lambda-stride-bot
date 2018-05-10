@@ -2,7 +2,6 @@ package org.kablambda.framework.modules;
 
 import java.util.List;
 
-import com.amazonaws.services.sns.model.PublishResult;
 import com.google.common.collect.Lists;
 
 import org.kablambda.aws.handler.HttpHandler;
@@ -14,6 +13,7 @@ import org.kablambda.json.Json;
 import static org.kablambda.aws.handler.PathHttpHandler.pathEqual;
 import static org.kablambda.aws.handler.SubjectSNSHandler.subjectMatch;
 import static org.kablambda.framework.modules.ModuleUtils.checkAndForward;
+import static org.kablambda.framework.modules.ModuleUtils.getTenantUuid;
 import static org.kablambda.framework.modules.ModuleUtils.performAction;
 
 /**
@@ -42,11 +42,11 @@ public class Bot implements Module {
         return Lists.newArrayList(
                 pathEqual(
                         getMentionPath(),
-                        r -> checkAndForward(r, getMentionSubject())
+                        r -> checkAndForward(r, getMentionSubject(), getTenantUuid(r))
                 ),
                 pathEqual(
                         getDirectMessagePath(),
-                        r -> checkAndForward(r, getDirectMessageSubject())
+                        r -> checkAndForward(r, getDirectMessageSubject(), getTenantUuid(r))
                 )
         );
     }
@@ -65,13 +65,12 @@ public class Bot implements Module {
         );
     }
 
-
     @Override
-    public void renderDescriptor(Json json) {
+    public void renderDescriptor(String tenantUuid, Json json) {
         json.object(j2 -> j2
                 .field("key", "bot-" + name)
-                .object("mention", j3 -> j3.field("url", "/api" + getMentionPath()))
-                .object("directMessage", j3 -> j3.field("url", "/api" + getDirectMessagePath()))
+                .object("mention", j3 -> j3.field("url", "/api/" + tenantUuid + "/" + getMentionPath()))
+                .object("directMessage", j3 -> j3.field("url", "/api/" + tenantUuid + "/" + getDirectMessagePath()))
         );
     }
 
@@ -82,11 +81,11 @@ public class Bot implements Module {
 
 
     private String getMentionPath() {
-        return "/" + name + "-mention";
+        return name + "-mention";
     }
 
     private String getDirectMessagePath() {
-        return "/" + name + "-direct-message";
+        return name + "-direct-message";
     }
 
     private String getMentionSubject() {

@@ -6,18 +6,6 @@ Parameters:
   DynamoDBEndpoint:
     Type: String
     Description: Optionally override the DynamoDB endpoint URL
-  StrideCredentials:
-    Type: String
-    Description: the api key and secret for the Stride API
-    NoEcho: true
-  MediaCredentials:
-    Type: String
-    Description: the api key and secret for the Media API
-    NoEcho: true
-  UserCredentials:
-    Type: String
-    Description: the api key and secret for the User API
-    NoEcho: true
   DarkSkyKey:
     Type: String
     Description: API key for Dark Sky API
@@ -90,7 +78,7 @@ Resources:
                     statusCode: '500'
                 requestParameters:
                   integration.request.path.object: method.request.path.item
-          /api/{path}:
+          /api/{path+}:
 #            options:
 #              x-amazon-apigateway-integration:
 #                type: mock
@@ -184,7 +172,6 @@ Resources:
             Method: any
       Environment:
         Variables:
-          STRIDE_CREDENTIALS: !Ref StrideCredentials
           DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
           BOT_TOPIC_ARN: !Ref BotTopic
           APP_CLASS_NAME: !Ref AppClassName
@@ -210,7 +197,6 @@ Resources:
             Topic: !Ref BotTopic
       Environment:
         Variables:
-          STRIDE_CREDENTIALS: !Ref StrideCredentials
           DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
           # I don't think BASE_URL is used
           BASE_URL: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production

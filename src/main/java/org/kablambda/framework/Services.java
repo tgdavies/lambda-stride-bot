@@ -31,6 +31,7 @@ import org.kablambda.aws.dynamodb.DBImpl;
 import org.kablambda.apis.document.DocumentNodeDeserialiser;
 import org.kablambda.apis.document.Node;
 import org.kablambda.apis.stride.messages.ChatMessageSent;
+import org.kablambda.aws.handler.RegisterHandler;
 
 /**
  * Provides services which only need to be created once, and which can be reused serially (i.e. not concurrently)
@@ -58,9 +59,9 @@ public class Services {
         return sns;
     }
 
-    public static Configuration getConfig() {
+    public static Configuration getConfig(String tenantUuid) {
         if (config == null) {
-            config = new ConfigurationBase();
+            config = new ConfigurationBase(tenantUuid);
         }
         return config;
     }
@@ -131,13 +132,13 @@ public class Services {
         --initCount;
     }
 
-    public static boolean duplicateMessage(HasUniqueId data) {
-        Optional<String> servedDate = getDB().read(data.getCloudId(), data.getUniqueId());
+    public static boolean duplicateMessage(String tenantUuid, HasUniqueId data) {
+        Optional<String> servedDate = getDB().read(tenantUuid, data.getCloudId(), data.getUniqueId());
         if (servedDate.isPresent()) {
             log("\nDUPLICATE REQUEST " + data.getUniqueId() + " ORIGINALLY SERVED AT " + servedDate.get());
             return true;
         } else {
-            getDB().write(data.getCloudId(), data.getUniqueId(), new Date().toString());
+            getDB().write(tenantUuid, data.getCloudId(), data.getUniqueId(), new Date().toString());
             return false;
         }
     }
@@ -154,5 +155,15 @@ public class Services {
                     }
                 }
             });
+    }
+
+    public static RegisterHandler.Register getTenant(String tenantUuid) {
+        return Services.getDB()
+                .read(
+                        tenantUuid,
+                        "noCloudId",
+                        "registered")
+                .map(s -> getGson().fromJson(s, RegisterHandler.Register.class))
+                .orElseThrow(() -> new RuntimeException("No tenant " + tenantUuid + " found"));
     }
 }

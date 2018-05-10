@@ -15,7 +15,7 @@ public interface Module {
 
     List<SNSHandler> getSNSHandlers(ApiFactory apiFactory);
 
-    void renderDescriptor(Json json);
+    void renderDescriptor(String tenantUuid, Json json);
 
     String getKey();
 }

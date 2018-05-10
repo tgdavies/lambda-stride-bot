@@ -6,15 +6,17 @@ import org.kablambda.apis.API;
 import org.kablambda.apis.jwt.JwtTools;
 import org.kablambda.apis.stride.messages.Installed;
 
+import static org.kablambda.framework.modules.ModuleUtils.getTenantUuid;
+
 /**
  * Handles /installed callbacks -- doesn't need to do anything at present, but we store the Installed POST document anyway.
  */
 public class InstallHttpHandler extends PathHttpHandler {
     public InstallHttpHandler(Configuration configuration) {
-        super(s -> s.equals("/api/installed"), r -> {
+        super(s -> s.equals("installed"), r -> {
             JwtTools.checkJwt(configuration.getCredentials(API.STRIDE), r);
             Installed installed = Services.getGson().fromJson(r.getBody(), Installed.class);
-            Services.getDB().write(installed.getCloudId(), "installed", r.getBody());
+            Services.getDB().write(getTenantUuid(r), installed.getCloudId(), "installed", r.getBody());
             return new Response(200);
         });
     }

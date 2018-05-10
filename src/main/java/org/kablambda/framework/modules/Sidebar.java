@@ -33,7 +33,7 @@ public class Sidebar implements Module {
     }
 
     private String getSidebarIframePath() {
-        return "/sidebar-" + key;
+        return "sidebar-" + key;
     }
 
     @Override
@@ -42,11 +42,11 @@ public class Sidebar implements Module {
     }
 
     @Override
-    public void renderDescriptor(Json json) {
+    public void renderDescriptor(String tenantUuid, Json json) {
         json.object(j2 -> j2
                 .field("key", key)
                 .object("name", j3 -> j3.field("value", name))
-                .field("url", "/api" + getSidebarIframePath())
+                .field("url", "/api/" + tenantUuid + "/" + getSidebarIframePath())
                 .field("authentication", "jwt")
         );
 

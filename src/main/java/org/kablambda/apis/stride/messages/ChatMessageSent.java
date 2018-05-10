@@ -10,6 +10,7 @@ public class ChatMessageSent implements HasUniqueId {
     private Sender sender;
     private Conversation conversation;
     private String type;
+    private String tenantUuid;
 
     public ChatMessageSent() {
     }

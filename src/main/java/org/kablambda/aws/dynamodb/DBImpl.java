@@ -21,12 +21,12 @@ import com.google.common.collect.Lists;
 
 
 public class DBImpl implements DB {
-    private final AmazonDynamoDB client;
     private final DynamoDB dynamoDB;
     private static final String TABLE_NAME = System.getenv("TABLE_NAME");
 
     public DBImpl() {
         String endPoint = System.getenv("DYNAMODB_ENDPOINT");
+        AmazonDynamoDB client;
         if (endPoint == null || endPoint.length() == 0) {
             final AwsClientBuilder.EndpointConfiguration endpointConfiguration =  new AwsClientBuilder.EndpointConfiguration("http://dynamodb.ap-southeast-2.amazonaws.com", Regions.AP_SOUTHEAST_2.getName());
             final ClientConfiguration clientConfiguration = new ClientConfiguration();
@@ -46,16 +46,20 @@ public class DBImpl implements DB {
     }
 
     @Override
-    public void write(String cloudId, String name, String value) {
+    public void write(String tenantUuid, String cloudId, String name, String value) {
         PutItemOutcome o = dynamoDB.getTable(TABLE_NAME).putItem(
-                new Item().withPrimaryKey("cloudId", cloudId + "/" + name)
+                new Item().withPrimaryKey("cloudId", makeKey(tenantUuid, cloudId, name))
                           .withString(name, value));
 
     }
 
     @Override
-    public Optional<String> read(String cloudId, String name) {
-        Item item = dynamoDB.getTable(TABLE_NAME).getItem("cloudId", cloudId + "/" + name);
+    public Optional<String> read(String tenantUuid, String cloudId, String name) {
+        Item item = dynamoDB.getTable(TABLE_NAME).getItem("cloudId", makeKey(tenantUuid, cloudId, name));
         return item == null ? Optional.empty() : Optional.ofNullable(item.getString(name));
+    }
+
+    private String makeKey(String tenantUuid, String cloudId, String name) {
+        return tenantUuid + "/" + cloudId + "/" + name;
     }
 }

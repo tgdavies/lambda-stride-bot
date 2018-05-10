@@ -1,5 +1,7 @@
 package org.kablambda.aws.handler;
 
+import java.util.Map;
+
 public class SNSData {
     private String Type;
     private String MessageId;
@@ -11,7 +13,7 @@ public class SNSData {
     private String SignatureVersion;
     private String SigningCertUrl;
     private String UnsubscribeUrl;
-    //TODO messageAttributes
+    private Map<String,Attribute> MessageAttributes;
 
     public SNSData() {
     }
@@ -50,5 +52,22 @@ public class SNSData {
 
     public String getUnsubscribeUrl() {
         return UnsubscribeUrl;
+    }
+
+    public Map<String, Attribute> getMessageAttributes() {
+        return MessageAttributes;
+    }
+
+    public static class Attribute {
+        private String Type;
+        private String Value;
+
+        public String getType() {
+            return Type;
+        }
+
+        public String getValue() {
+            return Value;
+        }
     }
 }

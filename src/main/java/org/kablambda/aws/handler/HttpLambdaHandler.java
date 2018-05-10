@@ -19,6 +19,8 @@ import org.kablambda.apis.stride.ApiFactory;
 import org.kablambda.apis.stride.ApiFactoryImpl;
 import org.kablambda.json.Json;
 
+import static org.kablambda.framework.modules.ModuleUtils.getTenantUuid;
+
 public class HttpLambdaHandler extends BaseLambdaHandler {
 
     public HttpLambdaHandler() {
@@ -27,16 +29,19 @@ public class HttpLambdaHandler extends BaseLambdaHandler {
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream) throws IOException {
 
-        Configuration config = Services.getConfig();
         Response r;
         try {
             HttpLambdaRequest httpLambdaRequest = Services.getGson().fromJson(new InputStreamReader(inputStream), HttpLambdaRequest.class);
+            Services.log("Path: " + httpLambdaRequest.getPath());
             try {
-                Services.log("Path: " + httpLambdaRequest.getPath());
+                String tenantUuid = getTenantUuid(httpLambdaRequest);
+                Configuration config = tenantUuid != null ? Services.getConfig(getTenantUuid(httpLambdaRequest)) : null;
 
                 ApiFactory apiFactory = new ApiFactoryImpl();
-                List<HttpHandler> httpHandlers = Lists.newArrayList(new AppDescriptorHttpHandler(), new InstallHttpHandler(config));
-                httpHandlers.addAll(mapEachModule(m -> m.getHttpHandlers(apiFactory)));
+                List<HttpHandler> httpHandlers = Lists.newArrayList(new RegisterHandler(), new AppDescriptorHttpHandler(), new InstallHttpHandler(config));
+                if (tenantUuid != null) {
+                    httpHandlers.addAll(mapEachModule(tenantUuid, m -> m.getHttpHandlers(apiFactory)));
+                }
                 r = httpHandlers
                         .stream()
                         .map(h -> h.handle(httpLambdaRequest))
@@ -56,7 +61,8 @@ public class HttpLambdaHandler extends BaseLambdaHandler {
             Services.log("\nERROR\n" + sw.toString() + "\n");
             r = new Response(500, errorBody(sw.toString()));
         }
-
+        Services.log("statusCode:" + r.getStatus());
+        Services.log("body:" + r.getBody());
         JsonWriter writer = new JsonWriter(new OutputStreamWriter(outputStream));
         writer.beginObject();
         writer.name("body");

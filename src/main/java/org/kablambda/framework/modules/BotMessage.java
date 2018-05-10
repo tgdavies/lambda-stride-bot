@@ -7,12 +7,14 @@ import com.google.common.collect.Lists;
 import org.kablambda.apis.stride.ApiFactory;
 import org.kablambda.apis.stride.messages.ChatMessageSent;
 import org.kablambda.aws.handler.HttpHandler;
+import org.kablambda.aws.handler.HttpLambdaRequest;
 import org.kablambda.aws.handler.SNSHandler;
 import org.kablambda.json.Json;
 
 import static org.kablambda.aws.handler.PathHttpHandler.pathEqual;
 import static org.kablambda.aws.handler.SubjectSNSHandler.subjectMatch;
 import static org.kablambda.framework.modules.ModuleUtils.checkAndForward;
+import static org.kablambda.framework.modules.ModuleUtils.getTenantUuid;
 import static org.kablambda.framework.modules.ModuleUtils.performAction;
 
 public class BotMessage implements Module {
@@ -31,7 +33,7 @@ public class BotMessage implements Module {
         return Lists.newArrayList(
                 pathEqual(
                         getMessagePath(),
-                        r -> checkAndForward(r, getMessageSubject())
+                        r -> checkAndForward(r, getMessageSubject(), getTenantUuid(r))
                 )
         );
     }
@@ -52,11 +54,11 @@ public class BotMessage implements Module {
     }
 
     @Override
-    public void renderDescriptor(Json json) {
+    public void renderDescriptor(String tenantUuid, Json json) {
         json.object(j2 -> j2
                 .field("key", "bot-message-" + key)
                 .field("pattern", pattern)
-                .field("url", "/api" + getMessagePath())
+                .field("url", "/api/" + tenantUuid + "/" + getMessagePath())
         );
     }
 
@@ -66,6 +68,6 @@ public class BotMessage implements Module {
     }
 
     private String getMessagePath() {
-        return "/" + key + "-message";
+        return key + "-message";
     }
 }

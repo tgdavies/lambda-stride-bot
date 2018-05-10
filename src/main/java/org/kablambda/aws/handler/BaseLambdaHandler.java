@@ -24,8 +24,8 @@ public abstract class BaseLambdaHandler implements RequestStreamHandler {
         }
     }
 
-    protected <T> List<T> mapEachModule(Function<Module,List<T>> f) {
-        return Services.getConfig().getModules().stream()
+    protected <T> List<T> mapEachModule(String tenantUuid, Function<Module,List<T>> f) {
+        return Services.getConfig(tenantUuid).getModules().stream()
                                   .flatMap(m -> f.apply(m).stream())
                                   .collect(Collectors.toList());
     }
