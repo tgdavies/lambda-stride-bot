@@ -31,18 +31,23 @@ public class HttpLambdaHandler extends BaseLambdaHandler {
         Response r;
         try {
             HttpLambdaRequest httpLambdaRequest = Services.getGson().fromJson(new InputStreamReader(inputStream), HttpLambdaRequest.class);
-            Services.log("Path: " + httpLambdaRequest.getPath());
+            try {
+                Services.log("Path: " + httpLambdaRequest.getPath());
 
-            ApiFactory apiFactory = new ApiFactoryImpl();
-            List<HttpHandler> httpHandlers = Lists.newArrayList(new AppDescriptorHttpHandler(), new InstallHttpHandler(config));
-            httpHandlers.addAll(mapEachModule(m -> m.getHttpHandlers(apiFactory)));
-            r = httpHandlers
-                    .stream()
-                    .map(h -> h.handle(httpLambdaRequest))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst()
-                    .orElse(new Response(404, errorBody("Path '" + httpLambdaRequest.getPath() + "' not mapped")));
+                ApiFactory apiFactory = new ApiFactoryImpl();
+                List<HttpHandler> httpHandlers = Lists.newArrayList(new AppDescriptorHttpHandler(), new InstallHttpHandler(config));
+                httpHandlers.addAll(mapEachModule(m -> m.getHttpHandlers(apiFactory)));
+                r = httpHandlers
+                        .stream()
+                        .map(h -> h.handle(httpLambdaRequest))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .findFirst()
+                        .orElse(new Response(404, errorBody("Path '" + httpLambdaRequest.getPath() + "' not mapped")));
+            } catch (Exception e) {
+                Services.log("Request: " + httpLambdaRequest);
+                throw e;
+            }
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
