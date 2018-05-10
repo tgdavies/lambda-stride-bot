@@ -11,20 +11,22 @@ import java.util.Map;
 
 public class JwtTools {
     public static void checkJwt(Credentials credentials, HttpLambdaRequest r) {
-        String token = r.getQueryStringParameters().get("jwt");
-        if (token == null) {
-            Map<String, String> headers = r.getHeaders();
-            if (headers == null) {
-                throw new RuntimeException("No headers present on request to " + r.getPath());
-            }
-            token = headers.get("Authorization");
-            if (token == null) {
-                throw new RuntimeException("No \"Authorization\" header present on request to " + r.getPath());
-            }
-        }
+        String token = extractToken(r);
+
         if (!Jwts.parser().setSigningKey(credentials.getClientSecret()).isSigned(token)) {
             throw new RuntimeException("Invalid JWT token on request to " + r.getPath());
         }
+    }
+
+    private static String extractToken(HttpLambdaRequest r) {
+        String token = null;
+        if (r.getQueryStringParameters() != null) {
+            token = r.getQueryStringParameters().get("jwt");
+        }
+        if (token == null) {
+            token = r.getHeaders().get("Authorization").substring(7);
+        }
+        return token;
     }
 
     public static String signJwt(Credentials credentials, Object payload) {
